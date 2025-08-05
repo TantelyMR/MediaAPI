@@ -1,4 +1,5 @@
 .env
+/node_modules
 
 python/.pt
 python/.pth
