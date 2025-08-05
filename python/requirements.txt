@@ -1,0 +1,11 @@
+fastapi==0.110.2
+uvicorn[standard]==0.29.0
+pillow==10.3.0
+torch==2.3.0
+timm==0.9.16
+open-clip-torch==2.23.0
+detoxify==0.5.2
+nudenet==0.5.5
+transformers==4.39.3
+scikit-learn==1.4.2
+numpy==1.26.4

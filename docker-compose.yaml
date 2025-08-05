@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  python:
+    build: ./python
+    environment:
+      - MAIN_SERVER_KEY=${MAIN_SERVER_KEY}
+    ports: ["8001:8001"]
+
+  server:
+    build: ./server
+    env_file: ./server/.env.sample
+    volumes:
+      - ./server/tmp:/tmp/media-api
+    depends_on:
+      - redis
+      - python
+    ports: ["8000:8000"]

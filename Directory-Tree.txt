@@ -1,0 +1,32 @@
+media-api/
+├── docker-compose.yml
+├── README.md
+├── server/                # Node + BullMQ + FFmpeg + Sharp
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── .env.sample
+│   └── src/
+│       ├── app.js
+│       ├── models/
+│       │   └── jobResultModel.js
+│       ├── routes/
+│       │   └── uploadRoutes.js
+│       ├── controllers/
+│       │   ├── uploadController.js
+│       │   └── resultController.js
+│       ├── middleware/
+│       │   └── multerSetup.js
+│       ├── queue/
+│       │   └── queues.js
+│       ├── workers/
+│       │   ├── imageWorker.js
+│       │   ├── videoWorker.js
+│       │   └── index.js
+│       └── utils/
+│           ├── clampTags.js
+│           ├── sharpConvert.js
+│           └── ffmpegConvert.js
+└── python/                # FastAPI + Detoxify + ShieldGemma + NSFW
+    ├── Dockerfile
+    ├── requirements.txt
+    └── app.py
