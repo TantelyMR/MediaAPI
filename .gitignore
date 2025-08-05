@@ -1,0 +1,10 @@
+.env
+
+python/.pt
+python/.pth
+python/*.h5
+python/pycache/
+python/.cache/
+
+.DS_Store
+*.swp

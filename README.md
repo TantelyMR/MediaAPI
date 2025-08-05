@@ -2,8 +2,6 @@
 
 A containerized, offline-ready microservice for image & video conversion with automated content analysis and tagging.
 
-[![CI](https://github.com/your-org/media-api/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/media-api/actions)
-[![Docker pulls](https://img.shields.io/docker/pulls/your-org/media-api.svg)](https://hub.docker.com/r/your-org/media-api)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 ---
@@ -25,7 +23,7 @@ A containerized, offline-ready microservice for image & video conversion with au
 ## Quick Start
 
 ```bash
-git clone https://github.com/your-org/media-api.git
+git clone https://github.com/TantelyMR/MediaAPI.git
 cd media-api
 cp server/.env.sample server/.env              # set MAIN_SERVER_KEY in .env
 docker compose up --build`
@@ -179,6 +177,34 @@ node src/app.js
 | `imageWorker.js` / `videoWorker.js` | Convert media & call model endpoints          |
 | `resultController.js`               | Streams file and sets `X-Result-Data` header  |
 | `python/app.py`                     | Hosts CLIP, NudeNet, violence — key-protected |
+
+---
+
+## Model Weights & Python Service Notes
+
+### What runs inside `python/app.py`
+
+| Endpoint               | Model / Library                                 | Approx. RAM | Notes                                     |
+|------------------------|-------------------------------------------------|-------------|-------------------------------------------|
+| `/clip-embed-image`    | `open_clip` ViT-B/32 (OpenAI)                   | ≈700 MB     | CPU-only (GPU optional). Provides 512-D vision vectors. |
+| `/clip-embed-text`     | same weights (text tower)                       | —           | Tokenisation done via `open_clip.tokenize`. |
+| `/nudenet-detect`      | NudeNet v0.5 “detector”                         | ≈800 MB     | Heaviest model in the stack.              |
+| `/violence-detect`     | ShieldGemma-2 prompt bank + CLIP similarity     | negligible  | Pure vector math after CLIP embedding.    |
+| `NSFW-JS` / DeepDanbooru | Loaded dynamically per request via TensorFlow | ≈120 MB     | Lightweight compared to NudeNet.         |
+
+> **Infrastructure sizing**  
+> • *Minimum*: 2 vCPU / 4 GB RAM (will swap when two big models overlap).  
+> • *Recommended*: 4 vCPU / 8 GB RAM for comfortable parallel video jobs.  
+> • Add a small NVIDIA GPU (6 GB +) if you want CLIP & NudeNet to run 8-10× faster; set `CUDA_VISIBLE_DEVICES` accordingly in `python/Dockerfile`.
+
+### Redis harmonisation tips
+
+* **Single instance** is used both for BullMQ queues **and** for short-lived result caching (`result:<id>` → TTL 1 h).  
+* Ensure Redis max-memory is large enough for video results (tens of MB each) if you expect many concurrent jobs.  
+* If you change Redis database index (e.g. `/1`) update `REDIS_URL` in `server/.env`.
+
+---
+
 
 License
 
